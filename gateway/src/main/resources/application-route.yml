@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: order-route
+          uri: lb://service-order
+          predicates:
+            - Path=/api/order/**
+          order: 1
+          filters:
+            - RewritePath=/api/order(?<segment>.*), /$\{segment}
+#            - OnceToken=X-Response-Token, jwt
+        - id: product-route
+          uri: lb://service-product
+          predicates:
+            - name: Path
+              args:
+                patterns: /api/product/**
+#            - name: Query
+#              args:
+#                param: q
+#                regexp: haha
+          order: 2
+          filters:
+            - RewritePath=/api/product(?<segment>.*), /$\{segment}
+      default-filters:
+        - AddResponseHeader=X-Response-Abc, 123
